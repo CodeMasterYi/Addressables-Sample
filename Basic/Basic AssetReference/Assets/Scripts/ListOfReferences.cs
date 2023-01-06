@@ -1,49 +1,47 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
-public class ListOfReferences : MonoBehaviour {
+public class ListOfReferences : MonoBehaviour
+{
+	[SerializeField]
+	private List<AssetReference> shapes;
 
-	public List<AssetReference> shapes;
+	private bool _isReady = false;
+	private int _toLoadCount;
 
-	bool m_IsReady = false;
-	int m_ToLoadCount;
+	private int _currentIndex = 0;
 
-	int currentIndex = 0;
-	// Use this for initialization
-	void Start ()
+	private void Start ()
 	{
-		m_ToLoadCount = shapes.Count;
+		_toLoadCount = shapes.Count;
 		foreach (var shape in shapes)
 		{
 			shape.LoadAssetAsync<GameObject>().Completed += OnShapeLoaded;
 		}
 	}
 
-	void OnShapeLoaded(AsyncOperationHandle<GameObject> obj)
+	private void OnShapeLoaded(AsyncOperationHandle<GameObject> obj)
 	{
-		m_ToLoadCount--;
-		if (m_ToLoadCount <= 0)
-			m_IsReady = true;
+		_toLoadCount--;
+		if (_toLoadCount <= 0)
+			_isReady = true;
 	}
 
 	public void SpawnAThing()
 	{
-		if (m_IsReady && shapes[currentIndex].Asset != null)
+		if (_isReady && shapes[_currentIndex].Asset != null)
 		{
-			for(int count = 0; count <= currentIndex; count++)
-				GameObject.Instantiate(shapes[currentIndex].Asset);
-			currentIndex++;
-			if (currentIndex >= shapes.Count)
-				currentIndex = 0;
-
+			for(var count = 0; count <= _currentIndex; count++)
+				Instantiate(shapes[_currentIndex].Asset);
+			_currentIndex++;
+			if (_currentIndex >= shapes.Count)
+				_currentIndex = 0;
 		}
 	}
 
-	void OnDestroy()
+	private void OnDestroy()
 	{
 		foreach (var shape in shapes)
 		{

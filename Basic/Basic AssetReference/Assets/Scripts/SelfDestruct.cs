@@ -1,18 +1,21 @@
 ﻿using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Scripting;
 
-public class SelfDestruct : MonoBehaviour {
+public class SelfDestruct : MonoBehaviour
+{
+	[SerializeField]
+	private float lifetime = 2f;
 
-	public float lifetime = 2f;
-
-	void Start()
+	private void Start()
 	{
-		Invoke("Release", lifetime);
+		Invoke(nameof(Release), lifetime);
 	}
 
-	void Release()
+	[Preserve]
+	private void Release()
 	{
-        if (!Addressables.ReleaseInstance(gameObject))
-            Destroy(gameObject);
+		if (!Addressables.ReleaseInstance(gameObject))
+			Destroy(gameObject);
 	}
 }
